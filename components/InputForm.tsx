@@ -14,12 +14,12 @@ import { useState } from "react";
 import CustomCard from "./CustomCard";
 import { useForm } from "react-hook-form";
 import ErrorMessage from "./ErrorMessage";
+import styles from "./styles/Styles.module.css";
 
 function InputForm() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -29,7 +29,15 @@ function InputForm() {
       suggestion: "",
     },
   });
-  const email = watch("email");
+
+  const handleSubmitCallback = (data: object) => {
+    fetch("/api/hello", { body: JSON.stringify(data), method: "POST" })
+      .then((res) => {
+        console.log(res);
+        return res.json();
+      })
+      .then((res) => console.log(res));
+  };
 
   const maxLength = 900;
   const [charsLeft, setCharsLeft] = useState(maxLength);
@@ -42,10 +50,11 @@ function InputForm() {
   return (
     <CustomCard>
       <form
+        // className={styles["form-style"]}
         noValidate={true}
-        onSubmit={handleSubmit((data) => console.log(data))}
+        onSubmit={handleSubmit(handleSubmitCallback)}
       >
-        <FormControl pt="5" isRequired>
+        <FormControl pt="3" isRequired>
           <Heading as="h1" size="xl" m="6">
             Contact Us!
           </Heading>
@@ -55,6 +64,7 @@ function InputForm() {
                 <div>
                   <FormLabel mb="8px">Your Name</FormLabel>
                   <Input
+                    m="4 auto"
                     {...register("name", {
                       required: "The Field is Required",
                       minLength: {
@@ -70,6 +80,7 @@ function InputForm() {
                 <div>
                   <FormLabel mb="8px">Your Last Name</FormLabel>
                   <Input
+                    m="4 auto"
                     {...register("lastName", {
                       required: "The Field is Required",
                     })}
@@ -79,16 +90,26 @@ function InputForm() {
                   <ErrorMessage>{errors.lastName?.message}</ErrorMessage>
                 </div>
               </HStack>
-              <FormLabel mb="8px">Your E-mail</FormLabel>
-              <Input
-                {...register("email", { required: "The Field is Required" })}
-                type="email"
-                placeholder="e-mail@xmpl.com"
-              />
-              <ErrorMessage>{errors.email?.message}</ErrorMessage>
-              <FormLabel>Ask us anything!</FormLabel>
+              <div>
+                <FormLabel mb="8px">Your E-mail</FormLabel>
+                <Input
+                  m="4 auto"
+                  {...register("email", {
+                    required: "The Field is Required",
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Entered value does not match email format",
+                    },
+                  })}
+                  type="email"
+                  placeholder="e-mail@xmpl.com"
+                />
+                <ErrorMessage>{errors.email?.message}</ErrorMessage>
+              </div>
               <Box>
+                <FormLabel>Ask us anything!</FormLabel>
                 <Textarea
+                  m="4 auto"
                   {...register("suggestion", {
                     required: "The Field is Required",
                   })}
