@@ -10,43 +10,17 @@ import {
   Box,
   FormLabel,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import CustomCard from "./CustomCard";
+import { useForm } from "react-hook-form";
 
 function InputForm() {
-  
-  const nameInputRef = useRef<HTMLInputElement>(null);
-
-  const lastNameInputRef = useRef<HTMLInputElement>(null);
-
-  const emailInputRef = useRef<HTMLInputElement>(null);
-
-  const suggestInputRef = useRef<HTMLTextAreaElement>(null);
-
-  let nameIsInvalid = true;
-  let lastNameIsInvalid = true;
-  let emailIsInvalid = true;
-  let textIsInvalid = true;
-
-  let disableCheck = nameIsInvalid || lastNameIsInvalid || emailIsInvalid || textIsInvalid;
-  
-  const formSubmitHandler = (event: React.FormEvent) => {
-    event.preventDefault();
-    if(!nameInputRef.current?.value) {
-
-    }
-    const suggestionInfo = {
-      name: nameInputRef.current?.value,
-      lastName: lastNameInputRef.current?.value,
-      email: emailInputRef.current?.value,
-      suggestion: suggestInputRef.current?.value,
-    }
-    nameIsInvalid = false;
-    lastNameIsInvalid = false;
-    emailIsInvalid = false;
-    textIsInvalid = false;
-    console.log(suggestionInfo)
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  console.log(errors);
 
   const maxLength = 900;
   const [charsLeft, setCharsLeft] = useState(maxLength);
@@ -58,7 +32,10 @@ function InputForm() {
 
   return (
     <CustomCard>
-      <form onSubmit={formSubmitHandler} noValidate={true}>
+      <form
+        noValidate={true}
+        onSubmit={handleSubmit((data) => console.log(data))}
+      >
         <FormControl pt="5" isRequired>
           <Heading as="h1" size="xl" m="6">
             Contact Us!
@@ -69,8 +46,13 @@ function InputForm() {
                 <div>
                   <FormLabel mb="8px">Your Name</FormLabel>
                   <Input
-                    isInvalid={nameIsInvalid}
-                    ref={nameInputRef}
+                    {...register("name", {
+                      required: "The Field is Required",
+                      minLength: {
+                        value: 3,
+                        message: "Min length is 3 characters",
+                      },
+                    })}
                     type="text"
                     placeholder="name"
                   />
@@ -78,8 +60,9 @@ function InputForm() {
                 <div>
                   <FormLabel mb="8px">Your Last Name</FormLabel>
                   <Input
-                    isInvalid={lastNameIsInvalid}
-                    ref={lastNameInputRef}
+                    {...register("lastName", {
+                      required: "The Field is Required",
+                    })}
                     type="text"
                     placeholder="last name"
                   />
@@ -87,16 +70,16 @@ function InputForm() {
               </HStack>
               <FormLabel mb="8px">Your E-mail</FormLabel>
               <Input
-                isInvalid={emailIsInvalid}
-                ref={emailInputRef}
+                {...register("email", { required: "The Field is Required" })}
                 type="email"
                 placeholder="e-mail@xmpl.com"
               />
               <FormLabel>Ask us anything!</FormLabel>
               <Box>
                 <Textarea
-                  isInvalid={textIsInvalid}
-                  ref={suggestInputRef}
+                  {...register("suggestion", {
+                    required: "The Field is Required",
+                  })}
                   maxLength={maxLength}
                   placeholder="Your Suggestions"
                   onChange={countHandler}
@@ -105,7 +88,7 @@ function InputForm() {
               </Box>
             </Stack>
           </InputGroup>
-          <Button isDisabled={disableCheck} m="4" type="submit" background="#10ABB4">
+          <Button m="4" type="submit" background="#10ABB4">
             Submit
           </Button>
         </FormControl>
