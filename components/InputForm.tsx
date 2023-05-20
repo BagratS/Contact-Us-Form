@@ -13,14 +13,23 @@ import {
 import { useState } from "react";
 import CustomCard from "./CustomCard";
 import { useForm } from "react-hook-form";
+import ErrorMessage from "./ErrorMessage";
 
 function InputForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
-  } = useForm();
-  console.log(errors);
+  } = useForm({
+    defaultValues: {
+      name: "",
+      lastName: "",
+      email: "",
+      suggestion: "",
+    },
+  });
+  const email = watch("email");
 
   const maxLength = 900;
   const [charsLeft, setCharsLeft] = useState(maxLength);
@@ -56,6 +65,7 @@ function InputForm() {
                     type="text"
                     placeholder="name"
                   />
+                  <ErrorMessage>{errors.name?.message}</ErrorMessage>
                 </div>
                 <div>
                   <FormLabel mb="8px">Your Last Name</FormLabel>
@@ -66,6 +76,7 @@ function InputForm() {
                     type="text"
                     placeholder="last name"
                   />
+                  <ErrorMessage>{errors.lastName?.message}</ErrorMessage>
                 </div>
               </HStack>
               <FormLabel mb="8px">Your E-mail</FormLabel>
@@ -74,6 +85,7 @@ function InputForm() {
                 type="email"
                 placeholder="e-mail@xmpl.com"
               />
+              <ErrorMessage>{errors.email?.message}</ErrorMessage>
               <FormLabel>Ask us anything!</FormLabel>
               <Box>
                 <Textarea
@@ -84,6 +96,7 @@ function InputForm() {
                   placeholder="Your Suggestions"
                   onChange={countHandler}
                 />
+                <ErrorMessage>{errors.suggestion?.message}</ErrorMessage>
                 <div>{`${charsLeft} characters left`}</div>
               </Box>
             </Stack>
